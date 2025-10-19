@@ -1,0 +1,11 @@
+[build-system]
+requires = ["setuptools>=69.0.0", "wheel>=0.42.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "disease-diagnosis-system"
+version = "1.0.0"
+description = "AI-powered healthcare application for disease diagnosis"
+readme = "README.md"
+requires-python = ">=3.13.0"
+license = {text = "MIT"}
