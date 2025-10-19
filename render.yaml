@@ -2,8 +2,10 @@ services:
   - type: web
     name: disease-diagnosis-system
     runtime: python
-    buildCommand: "chmod +x build.sh && ./build.sh"
-    startCommand: "gunicorn --chdir app app:app"
+    buildCommand: "pip install --upgrade pip && pip install -r requirements.txt"
+    startCommand: "gunicorn --chdir app app_deployment:app"
     envVars:
       - key: PYTHON_VERSION
-        value: 3.13.4
+        value: 3.11.8
+      - key: PYTHON_SETUPTOOLS_UNSAFE_INSTALL
+        value: "1"

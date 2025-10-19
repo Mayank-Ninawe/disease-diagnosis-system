@@ -630,25 +630,23 @@
     <script>
         let allSymptoms = [];
         
-        // Load symptoms when page loads
+        // For deployment test version - load mock symptoms 
         window.onload = function() {
-            console.log('🔄 Loading symptoms from backend...');
+            console.log('🔄 Loading mock symptoms for deployment test...');
             
-            fetch('http://localhost:5000/get_symptoms')
-                .then(response => response.json())
-                .then(data => {
-                    if (data.symptoms) {
-                        allSymptoms = data.symptoms;
-                        populateSymptoms(allSymptoms);
-                        console.log(`✅ Loaded ${allSymptoms.length} symptoms`);
-                    } else {
-                        throw new Error('No symptoms in response');
-                    }
-                })
-                .catch(error => {
-                    console.error('❌ Error loading symptoms:', error);
-                    alert('⚠️ Error loading symptoms! Make sure Flask server is running.');
-                });
+            // Sample symptoms for demonstration
+            const mockSymptoms = [
+                "itching", "skin_rash", "nodal_skin_eruptions", "continuous_sneezing", 
+                "shivering", "chills", "joint_pain", "stomach_pain", "acidity", 
+                "vomiting", "burning_micturition", "fatigue", "anxiety", 
+                "cold_hands_and_feet", "mood_swings", "weight_loss", "restlessness", 
+                "lethargy", "cough", "high_fever", "breathlessness", "sweating", 
+                "headache", "yellowish_skin", "dark_urine", "nausea", "loss_of_appetite"
+            ];
+            
+            allSymptoms = mockSymptoms;
+            populateSymptoms(mockSymptoms);
+            console.log(`✅ Loaded ${mockSymptoms.length} sample symptoms for testing`);
         };
         
         // Populate dropdown
@@ -682,29 +680,15 @@
                 return;
             }
             
-            // Create symptom array with DYNAMIC LENGTH from backend
-            let symptoms = new Array(allSymptoms.length).fill(0);
-            
-            // Mark selected symptoms as 1
-            selectedSymptoms.forEach(symptom => {
-                const index = allSymptoms.indexOf(symptom);
-                if (index !== -1) {
-                    symptoms[index] = 1;
-                }
-            });
-
-            console.log('📤 Selected symptoms:', selectedSymptoms);
-            console.log(`📊 Sending ${symptoms.length} features (${symptoms.filter(s => s === 1).length} active)`);
-            
             // Show loading
             document.getElementById('loading').style.display = 'block';
             document.getElementById('result').style.display = 'none';
 
-            // Call API
-            fetch('http://localhost:5000/predict', {
+            // Call API with simplified request for deployment testing
+            fetch('/predict', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({symptoms: symptoms})
+                body: JSON.stringify({symptoms: selectedSymptoms})
             })
             .then(response => response.json())
             .then(data => {
@@ -713,23 +697,21 @@
                 // Hide loading
                 document.getElementById('loading').style.display = 'none';
                 
-                // Display results
-                document.getElementById('disease').innerText = data.disease || 'Unknown';
-                document.getElementById('confidence').innerText = data.confidence || 'N/A';
-                document.getElementById('rf').innerText = data.rf_prediction || 'N/A';
-                document.getElementById('nb').innerText = data.nb_prediction || 'N/A';
-                document.getElementById('svm').innerText = data.svm_prediction || 'N/A';
+                // Display results - for deployment test version
+                document.getElementById('disease').innerText = data.prediction || 'Unknown';
+                document.getElementById('confidence').innerText = `${data.confidence}%` || 'N/A';
+                
+                // Display model contributions
+                if (data.model_contributions) {
+                    document.getElementById('rf').innerText = `${data.model_contributions['Random Forest']}%`;
+                    document.getElementById('nb').innerText = `${data.model_contributions['Naive Bayes']}%`;
+                    document.getElementById('svm').innerText = `${data.model_contributions['SVM']}%`;
+                }
                 
                 // Show results
                 const resultDiv = document.getElementById('result');
                 resultDiv.style.display = 'block';
-                
-                // Style based on result
-                if (data.disease.includes('Error')) {
-                    resultDiv.className = 'result error';
-                } else {
-                    resultDiv.className = 'result success';
-                }
+                resultDiv.className = 'result success';
                 
                 // Smooth scroll
                 resultDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
@@ -737,7 +719,7 @@
             .catch(error => {
                 console.error('❌ Error:', error);
                 document.getElementById('loading').style.display = 'none';
-                alert('❌ Error! Make sure Flask server is running on port 5000.');
+                alert('❌ Error! Make sure the server is running.');
             });
         }
     </script>
