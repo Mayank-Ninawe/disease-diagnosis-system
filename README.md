@@ -51,23 +51,25 @@ This project implements a web-based disease diagnosis system that uses machine l
 ## 💻 Technology Stack
 
 ### Backend
-- **Language**: Python 3.10
-- **Framework**: Flask 2.3.0
+- **Language**: Python 3.13.4
+- **Framework**: Flask 2.0.1
 - **ML Libraries**: 
   - scikit-learn 1.3.0
   - pandas 2.0.0
   - numpy 1.24.0
 - **Model Serialization**: pickle
+- **Deployment**: Render Cloud Platform
 
 ### Frontend
 - HTML5
 - CSS3 (Bootstrap 5.1.3)
 - Vanilla JavaScript
-- Responsive design
+- Responsive design with animation effects
+- Mobile-friendly interface
 
 ### Machine Learning
 - **Algorithms**: Random Forest, Gaussian Naive Bayes, SVM
-- **Technique**: Ensemble Learning (Majority Voting)
+- **Technique**: Enhanced Ensemble Learning (Weighted Voting based on confidence scores)
 - **Encoding**: Label Encoding for target variable
 
 ---
@@ -95,74 +97,176 @@ This project implements a web-based disease diagnosis system that uses machine l
 
 ## 📁 Project Structure
 
+```
 disease-diagnosis/
 │
-├── README.md # Project documentation
-├── requirements.txt # Python dependencies
+├── README.md                  # Project documentation
+├── requirements.txt           # Python dependencies
+├── runtime.txt                # Python version specification
+├── Procfile                   # Deployment process file
+├── render.yaml                # Render deployment configuration
 │
 ├── data/
-│ └── Training.csv # Disease-symptom dataset
+│   ├── Training.csv           # Disease-symptom dataset
+│   └── Testing.csv            # Test dataset
 │
 ├── notebooks/
-│ ├── 01_data_exploration.ipynb # EDA notebook
-│ └── 02_model_training.ipynb # Model training notebook
+│   ├── 01_data_exploration.ipynb  # EDA notebook
+│   └── 02_model_training.ipynb    # Model training notebook
 │
 ├── models/
-│ ├── rf_model.pkl # Random Forest model
-│ ├── nb_model.pkl # Naive Bayes model
-│ ├── svm_model.pkl # SVM model
-│ ├── label_encoder.pkl # Disease label encoder
-│ └── feature_names.pkl # Symptom feature names
+│   ├── rf_model.pkl           # Random Forest model
+│   ├── nb_model.pkl           # Naive Bayes model
+│   ├── svm_model.pkl          # SVM model
+│   ├── label_encoder.pkl      # Disease label encoder
+│   └── feature_names.pkl      # Symptom feature names
 │
 ├── app/
-│ ├── app.py # Flask backend server
-│ └── templates/
-│ └── index.html # Frontend interface
+│   ├── app.py                 # Flask backend server with ML integration
+│   ├── app_deployment.py      # Simplified deployment version
+│   └── templates/
+│       └── index.html         # Enhanced frontend interface
 │
 └── screenshots/
-├── homepage.png
-├── symptom_selection.png
-└── prediction_result.png
-
-text
+    ├── homepage.png
+    ├── symptom_selection.png
+    └── prediction_result.png
+```
 
 ---
 
 ## 🔧 Installation & Setup
 
 ### Prerequisites
-- Python 3.8 or higher
+- Python 3.10 or higher (3.13.4 recommended)
 - pip package manager
 - Web browser (Chrome, Firefox, Edge)
 
-### Step 1: Extract Project
-unzip Group_XX_ML_Lab_V_A.zip
-cd Group_XX_ML_Lab_V_A
+### Local Development Setup
 
-text
+#### Step 1: Clone the Repository
+```bash
+git clone https://github.com/Mayank-Ninawe/disease-diagnosis-system.git
+cd disease-diagnosis-system
+```
 
-### Step 2: Install Dependencies
+#### Step 2: Install Dependencies
+```bash
 pip install -r requirements.txt
+```
 
-text
-
-### Step 3: Verify Models (Optional)
+#### Step 3: Verify Models (Optional)
+```bash
 jupyter notebook
+```
+Open and run `notebooks/02_model_training.ipynb` to train models from scratch
 
-Open and run notebooks/02_model_training.ipynb
-text
-
-### Step 4: Start Flask Server
+#### Step 4: Start Flask Server
+```bash
 cd app
 python app.py
+```
 
-text
-
-### Step 5: Access Application
+#### Step 5: Access Application
 Open browser and navigate to:
+```
 http://localhost:5000
+```
 
-text
+## 🚀 Deployment Guide
+
+### Render.com Deployment
+
+This application has been optimized for deployment on [Render.com](https://render.com/), a modern cloud platform. The deployment strategy uses a two-phase approach:
+
+1. **Initial Deployment**: Simplified version without ML dependencies
+2. **Full Deployment**: Complete application with ML capabilities
+
+#### Deployment Files
+
+| File | Purpose |
+|------|---------|
+| `runtime.txt` | Specifies Python 3.13.4 as runtime |
+| `Procfile` | Defines web process using gunicorn |
+| `render.yaml` | Render-specific configuration |
+| `requirements.txt` | Core dependencies |
+| `app/app_deployment.py` | Simplified deployment version |
+| `build.sh` | Custom build script |
+| `setup_deployment.sh` | Setup script for deployment |
+
+#### Step-by-Step Deployment
+
+1. **Fork/Clone Repository**
+   ```bash
+   git clone https://github.com/Mayank-Ninawe/disease-diagnosis-system.git
+   cd disease-diagnosis-system
+   ```
+
+2. **Create Render Account**
+   - Sign up at [Render.com](https://render.com/)
+   - Verify your email
+
+3. **Connect Repository**
+   - Go to Render Dashboard
+   - Click "New +" and select "Web Service"
+   - Connect your GitHub/GitLab account
+   - Select the disease-diagnosis repository
+
+4. **Configure Web Service**
+   - **Name**: `disease-diagnosis` (or your preferred name)
+   - **Environment**: `Python 3`
+   - **Region**: Choose nearest data center
+   - **Branch**: `main` (or your deployment branch)
+   - **Build Command**: `./build.sh`
+   - **Start Command**: `gunicorn --chdir app app_deployment:app`
+   - **Plan**: Free (or paid if needed)
+
+5. **Add Environment Variables**
+   - Click "Advanced" during setup
+   - Add: `PYTHON_VERSION=3.13.4`
+   - Add: `DEPLOYMENT_MODE=simplified`
+
+6. **Deploy the Service**
+   - Click "Create Web Service"
+   - Wait for build and deployment (5-10 minutes)
+   - Your app will be available at: `https://your-service-name.onrender.com`
+
+### Troubleshooting Deployment
+
+| Issue | Solution |
+|-------|----------|
+| **Build Failure** | Check build logs for specific error messages |
+| **Metadata Generation Failed** | Use `app_deployment.py` which avoids ML dependencies |
+| **Module Not Found** | Verify requirements.txt has all dependencies |
+| **Application Error** | Check logs in Render dashboard |
+| **Timeout During Build** | Increase build timeout in Render settings |
+
+### Scaling to Full ML Functionality
+
+After successful deployment of the simplified version:
+
+1. Gradually add ML dependencies back:
+   ```bash
+   # Add to requirements.txt one at a time
+   numpy==1.24.0
+   pandas==2.0.0
+   scikit-learn==1.3.0
+   ```
+
+2. Update environment variable:
+   ```
+   DEPLOYMENT_MODE=full
+   ```
+
+3. Modify `app_deployment.py` to load ML models when `DEPLOYMENT_MODE=full`
+
+4. Redeploy the application
+
+### Monitoring & Logs
+
+- Access logs from Render Dashboard
+- Monitor memory usage and adjust plan if needed
+- Set up alerts for application errors
 
 ---
 
@@ -212,22 +316,40 @@ text
 
 ### API Testing
 
-**Health Check:**
+#### Local Testing
+
+```bash
+# Health Check
 curl http://localhost:5000/test
 
-text
-
-**Get Symptoms:**
+# Get Symptoms List
 curl http://localhost:5000/get_symptoms
 
-text
-
-**Make Prediction:**
-curl -X POST http://localhost:5000/predict
--H "Content-Type: application/json"
+# Make Prediction (Local)
+curl -X POST http://localhost:5000/predict \
+-H "Content-Type: application/json" \
 -d '{"symptoms": [1,0,0,1,0,...]}' # 130 binary values
+```
 
-text
+#### Cloud Testing (Render)
+
+```bash
+# Replace with your actual Render URL
+export RENDER_URL=https://your-app-name.onrender.com
+
+# Health Check
+curl $RENDER_URL/test
+
+# Get Symptoms List
+curl $RENDER_URL/get_symptoms
+
+# Make Prediction
+curl -X POST $RENDER_URL/predict \
+-H "Content-Type: application/json" \
+-d '{"symptoms": [1,0,0,1,0,...]}' # 130 binary values
+```
+
+> **Note**: The simplified deployment version returns mock predictions until ML functionality is added back.
 
 ---
 
@@ -244,11 +366,13 @@ text
 - [ ] PDF report generation
 
 ### Technical Improvements
+- [x] Cloud deployment (Render.com)
+- [ ] Dockerization for consistent environment
 - [ ] Deep learning models (CNN, LSTM)
-- [ ] Cloud deployment (AWS, Azure, Heroku)
 - [ ] Database integration (PostgreSQL, MongoDB)
 - [ ] User authentication system
 - [ ] RESTful API documentation (Swagger)
+- [ ] CI/CD pipeline integration
 
 ---
 
