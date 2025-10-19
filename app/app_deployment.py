@@ -24,6 +24,23 @@ def test():
         'version': '1.0.0'
     })
 
+@app.route('/get_symptoms', methods=['GET'])
+def get_symptoms():
+    # Sample symptoms for deployment testing
+    mock_symptoms = [
+        "itching", "skin_rash", "nodal_skin_eruptions", "continuous_sneezing", 
+        "shivering", "chills", "joint_pain", "stomach_pain", "acidity", 
+        "vomiting", "burning_micturition", "fatigue", "anxiety", 
+        "cold_hands_and_feet", "mood_swings", "weight_loss", "restlessness", 
+        "lethargy", "cough", "high_fever", "breathlessness", "sweating", 
+        "headache", "yellowish_skin", "dark_urine", "nausea", "loss_of_appetite"
+    ]
+    
+    return jsonify({
+        'symptoms': mock_symptoms,
+        'count': len(mock_symptoms)
+    })
+
 @app.route('/predict', methods=['POST'])
 def predict():
     # This is a simplified version for initial deployment
