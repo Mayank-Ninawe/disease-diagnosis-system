@@ -49,15 +49,13 @@ def predict():
         data = request.get_json()
         symptoms = data.get('symptoms', [])
         
-        # Just return a placeholder response for now
+        # Return response in the format expected by the frontend
         return jsonify({
-            'prediction': 'Deployment Test',
-            'confidence': 95,
-            'model_contributions': {
-                'Random Forest': 33.3,
-                'Naive Bayes': 33.3,
-                'SVM': 33.3
-            }
+            'disease': 'Deployment Test',
+            'confidence': '85%',
+            'rf_prediction': 'Common Cold',
+            'nb_prediction': 'Influenza',
+            'svm_prediction': 'Common Cold'
         })
     except Exception as e:
         print(f"Error in prediction: {str(e)}")
