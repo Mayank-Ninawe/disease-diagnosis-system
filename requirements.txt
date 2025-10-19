@@ -1,14 +1,15 @@
 # Core dependencies only - for initial deployment
 Flask==2.0.1
 Flask-Cors==3.0.10
-gunicorn==20.1.0
+gunicorn==21.2.0  # Updated for Python 3.13 compatibility
 Werkzeug==2.0.1
 Jinja2==3.0.1
 MarkupSafe==2.0.1
 itsdangerous==2.0.1
 click==8.0.1
-setuptools==59.8.0  # Explicitly add setuptools to resolve import issues
-wheel==0.37.1       # Required for some packages
+setuptools==68.2.2  # Updated for Python 3.13 compatibility
+wheel==0.41.2       # Updated for Python 3.13 compatibility
+importlib-metadata==6.8.0  # Added to fix pkg_resources issue
 
 # ML dependencies are commented out for initial deployment to avoid build errors
 # These will be added back incrementally after initial deployment is successful

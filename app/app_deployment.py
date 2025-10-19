@@ -7,7 +7,7 @@ from flask_cors import CORS
 import os
 import random
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='static')
 CORS(app)
 
 print("\n" + "="*60)
@@ -48,7 +48,14 @@ SYMPTOM_DISEASE_MAPPING = {
 
 @app.route('/')
 def home():
-    return render_template('index.html')
+    try:
+        return render_template('index.html')
+    except Exception as e:
+        print(f"Error rendering home page: {e}")
+        return jsonify({
+            'status': 'Error rendering home page',
+            'error': str(e)
+        }), 500
 
 @app.route('/test', methods=['GET'])
 def test():

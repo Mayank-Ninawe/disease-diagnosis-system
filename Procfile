@@ -1,1 +1,1 @@
-web: gunicorn wsgi:app
+web: cd app && gunicorn app_deployment:app --log-file=- --log-level=info
