@@ -2,7 +2,7 @@ services:
   - type: web
     name: disease-diagnosis-system
     runtime: python
-    buildCommand: "chmod +x ./setup_deployment.sh && ./setup_deployment.sh"
+    buildCommand: "pip install -r requirements.txt"
     startCommand: "gunicorn --chdir app app:app --log-level debug"
     envVars:
       - key: PYTHON_VERSION

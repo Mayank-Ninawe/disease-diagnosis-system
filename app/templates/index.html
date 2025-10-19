@@ -630,23 +630,34 @@
     <script>
         let allSymptoms = [];
         
-        // For deployment test version - load mock symptoms 
+        // Load symptoms from backend
         window.onload = function() {
-            console.log('🔄 Loading mock symptoms for deployment test...');
+            console.log('🔄 Loading symptoms...');
             
-            // Sample symptoms for demonstration
-            const mockSymptoms = [
-                "itching", "skin_rash", "nodal_skin_eruptions", "continuous_sneezing", 
-                "shivering", "chills", "joint_pain", "stomach_pain", "acidity", 
-                "vomiting", "burning_micturition", "fatigue", "anxiety", 
-                "cold_hands_and_feet", "mood_swings", "weight_loss", "restlessness", 
-                "lethargy", "cough", "high_fever", "breathlessness", "sweating", 
-                "headache", "yellowish_skin", "dark_urine", "nausea", "loss_of_appetite"
-            ];
-            
-            allSymptoms = mockSymptoms;
-            populateSymptoms(mockSymptoms);
-            console.log(`✅ Loaded ${mockSymptoms.length} sample symptoms for testing`);
+            // Get symptoms from backend
+            fetch('/get_symptoms')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.symptoms) {
+                        allSymptoms = data.symptoms;
+                        populateSymptoms(allSymptoms);
+                        console.log(`✅ Loaded ${allSymptoms.length} symptoms`);
+                    } else {
+                        throw new Error('No symptoms in response');
+                    }
+                })
+                .catch(error => {
+                    console.error('❌ Error loading symptoms:', error);
+                    // Use backup symptoms if loading fails
+                    const backupSymptoms = [
+                        "itching", "skin_rash", "nodal_skin_eruptions", "continuous_sneezing", 
+                        "shivering", "chills", "joint_pain", "stomach_pain", "acidity", 
+                        "vomiting", "burning_micturition", "fatigue", "anxiety"
+                    ];
+                    allSymptoms = backupSymptoms;
+                    populateSymptoms(backupSymptoms);
+                    console.log(`✅ Loaded ${backupSymptoms.length} backup symptoms`);
+                });
         };
         
         // Populate dropdown
@@ -684,7 +695,7 @@
             document.getElementById('loading').style.display = 'block';
             document.getElementById('result').style.display = 'none';
 
-            // Call API with simplified request for deployment testing
+            // Call API 
             fetch('/predict', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
@@ -697,16 +708,12 @@
                 // Hide loading
                 document.getElementById('loading').style.display = 'none';
                 
-                // Display results - for deployment test version
-                document.getElementById('disease').innerText = data.prediction || 'Unknown';
-                document.getElementById('confidence').innerText = `${data.confidence}%` || 'N/A';
-                
-                // Display model contributions
-                if (data.model_contributions) {
-                    document.getElementById('rf').innerText = `${data.model_contributions['Random Forest']}%`;
-                    document.getElementById('nb').innerText = `${data.model_contributions['Naive Bayes']}%`;
-                    document.getElementById('svm').innerText = `${data.model_contributions['SVM']}%`;
-                }
+                // Display results
+                document.getElementById('disease').innerText = data.disease || 'Unknown';
+                document.getElementById('confidence').innerText = data.confidence || 'N/A';
+                document.getElementById('rf').innerText = data.rf_prediction || 'N/A';
+                document.getElementById('nb').innerText = data.nb_prediction || 'N/A';
+                document.getElementById('svm').innerText = data.svm_prediction || 'N/A';
                 
                 // Show results
                 const resultDiv = document.getElementById('result');
