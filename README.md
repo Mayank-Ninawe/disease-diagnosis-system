@@ -177,34 +177,32 @@ http://localhost:5000
 
 ### Render.com Deployment
 
-This application has been optimized for deployment on [Render.com](https://render.com/), a modern cloud platform. The deployment strategy uses a two-phase approach:
+This application uses a two-phase deployment strategy on [Render.com](https://render.com/):
 
-1. **Initial Deployment**: Simplified version without ML dependencies
-2. **Full Deployment**: Complete application with ML capabilities
+1. **Phase 1 (Current)**: Simplified version without ML dependencies to avoid build errors
+2. **Phase 2**: Full application with ML capabilities once base deployment is stable
 
-#### Deployment Files
+#### Key Deployment Files
 
 | File | Purpose |
 |------|---------|
-| `runtime.txt` | Specifies Python 3.13.4 as runtime |
-| `Procfile` | Defines web process using gunicorn |
-| `render.yaml` | Render-specific configuration |
-| `requirements.txt` | Core dependencies |
-| `app/app_deployment.py` | Simplified deployment version |
-| `build.sh` | Custom build script |
-| `setup_deployment.sh` | Setup script for deployment |
+| `wsgi.py` | Entry point that chooses between full/simplified versions |
+| `Procfile` | Defines web process using gunicorn with wsgi.py |
+| `requirements.txt` | Core dependencies (ML dependencies commented out) |
+| `build.sh` | Custom build script that installs setuptools explicitly |
+| `app/app.py` | Full version with ML functionality |
+| `app/app_deployment.py` | Simplified version without ML dependencies |
 
-#### Step-by-Step Deployment
+#### Step-by-Step Deployment Instructions
 
-1. **Fork/Clone Repository**
-   ```bash
-   git clone https://github.com/Mayank-Ninawe/disease-diagnosis-system.git
-   cd disease-diagnosis-system
-   ```
+1. **Prepare Your Codebase**
+   - Ensure all files are committed to your repository
+   - Make sure `wsgi.py` and `build.sh` are in the root directory
+   - Verify `requirements.txt` has ML dependencies commented out initially
 
 2. **Create Render Account**
    - Sign up at [Render.com](https://render.com/)
-   - Verify your email
+   - Verify your email address
 
 3. **Connect Repository**
    - Go to Render Dashboard
@@ -217,56 +215,69 @@ This application has been optimized for deployment on [Render.com](https://rende
    - **Environment**: `Python 3`
    - **Region**: Choose nearest data center
    - **Branch**: `main` (or your deployment branch)
-   - **Build Command**: `./build.sh`
-   - **Start Command**: `gunicorn --chdir app app_deployment:app`
+   - **Build Command**: `chmod +x build.sh && ./build.sh`
+   - **Start Command**: `gunicorn wsgi:app`
    - **Plan**: Free (or paid if needed)
 
 5. **Add Environment Variables**
    - Click "Advanced" during setup
    - Add: `PYTHON_VERSION=3.13.4`
-   - Add: `DEPLOYMENT_MODE=simplified`
+   - Add: `DEPLOYMENT_MODE=deployment`
 
 6. **Deploy the Service**
    - Click "Create Web Service"
    - Wait for build and deployment (5-10 minutes)
    - Your app will be available at: `https://your-service-name.onrender.com`
 
-### Troubleshooting Deployment
+### Troubleshooting Common Issues
 
 | Issue | Solution |
 |-------|----------|
-| **Build Failure** | Check build logs for specific error messages |
-| **Metadata Generation Failed** | Use `app_deployment.py` which avoids ML dependencies |
-| **Module Not Found** | Verify requirements.txt has all dependencies |
-| **Application Error** | Check logs in Render dashboard |
+| **setuptools.build_meta errors** | Our `build.sh` now explicitly installs setuptools first |
+| **numpy build failures** | ML dependencies are commented out in `requirements.txt` for initial deployment |
+| **Module Not Found** | Check if setuptools is installed properly |
+| **Application Error** | Verify `wsgi.py` is properly detecting deployment mode |
 | **Timeout During Build** | Increase build timeout in Render settings |
 
-### Scaling to Full ML Functionality
+### Upgrading to Full ML Functionality
 
-After successful deployment of the simplified version:
+After your simplified version is successfully deployed:
 
-1. Gradually add ML dependencies back:
+1. **Update requirements.txt gradually**:
    ```bash
-   # Add to requirements.txt one at a time
+   # First add numpy alone and test
    numpy==1.24.0
-   pandas==2.0.0
+   
+   # Then add scikit-learn and test
    scikit-learn==1.3.0
+   
+   # Finally add pandas
+   pandas==2.0.0
    ```
 
-2. Update environment variable:
+2. **Upload ML model files**:
+   - Create a `/models` directory in your repository
+   - Upload the pickle model files to this directory
+   - Commit and push these changes
+
+3. **Switch to full mode**:
+   - In Render dashboard, change the environment variable:
    ```
    DEPLOYMENT_MODE=full
    ```
 
-3. Modify `app_deployment.py` to load ML models when `DEPLOYMENT_MODE=full`
+4. **Redeploy your application**:
+   - Manually trigger a redeploy from the Render dashboard
+   - Monitor logs to ensure models are loaded correctly
 
-4. Redeploy the application
+### Monitoring & Debugging
 
-### Monitoring & Logs
+- **View Logs**: Access detailed logs from Render Dashboard
+- **Error Tracking**: Check application logs for model loading errors
+- **Memory Usage**: Monitor RAM usage and upgrade plan if needed
+- **Request Tracing**: Enable request logging to diagnose API issues
 
-- Access logs from Render Dashboard
-- Monitor memory usage and adjust plan if needed
-- Set up alerts for application errors
+**Pro Tip**: If you encounter persistent ML dependency issues, consider using precompiled wheels or Docker deployment.
 
 ---
 
