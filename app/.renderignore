@@ -1,0 +1,29 @@
+# Ignore development files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Ignore notebooks and data during deployment
+notebooks/
+data/
+
+# Ignore version control
+.git/
+.gitignore
+
+# Ignore editor settings
+.vscode/
+.idea/
+
+# Ignore test files
+test/
+tests/
+
+# Ignore local environment
+venv/
+env/
+.env
+
+# Large files
+*.csv
+*.pkl
